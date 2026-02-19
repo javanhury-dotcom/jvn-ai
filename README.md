@@ -2711,22 +2711,25 @@ Respond in the language requested (English, Kinyarwanda, or French).`;
     env:             'sandbox',                  // Change to 'mtnrwanda' for production
     baseUrl:         'https://sandbox.momodeveloper.mtn.com', // Live: https://proxy.momoapi.mtn.com
     // ── YOUR MERCHANT MOMO NUMBER (money goes here) ──
-    merchantNumber:  '25078933601',             // Your JVN AI MoMo number (international format)
+    merchantNumber:  '250789336011',             // Your JVN AI MoMo number (international format)
     // ── PROXY: your backend URL that forwards to MTN (required for browsers) ──
     proxyBase:       '/api/momo',                // e.g. 'https://yourserver.com/api/momo'
   };
 
   // Format phone to MTN international format: 250XXXXXXXXX
   function formatMoMoPhone(raw) {
-    let digits = raw.replace(/\D/g, '');
-    if (digits.startsWith('0')) digits = '250' + digits.slice(1);
+    // Strip spaces, dashes, dots, brackets first
+    let digits = raw.replace(/[\s\-\.\(\)]/g, '').replace(/\D/g, '');
+    if (digits.startsWith('00250')) digits = digits.slice(2);
+    if (digits.startsWith('250') && digits.length === 12) return digits;
+    if (digits.startsWith('0') && digits.length === 10) digits = '250' + digits.slice(1);
     if (!digits.startsWith('250')) digits = '250' + digits;
     return digits;
   }
 
-  // Validate MTN Rwanda numbers (078x, 079x)
+  // Validate MTN & Airtel Rwanda numbers (072x, 073x, 078x, 079x)
   function isValidMTNNumber(formatted) {
-    return /^25007[89]\d{7}$/.test(formatted);
+    return /^2507[2389]\d{7}$/.test(formatted);
   }
 
   // Get MoMo access token via proxy
